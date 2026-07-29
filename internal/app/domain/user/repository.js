@@ -30,6 +30,7 @@ const findByEmail = async (email) => {
 const create = async (data) => {
   return await prisma.user.create({
     data,
+    include: { role: true },
   });
 };
 

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const handler = require("./handler");
 const authMiddleware = require("../../middleware/auth");
-const { ADMIN, MANAGER, USER } = require("../../../../pkg/constants/roles");
+const { ADMIN, MANAGER, USER } = require("../../../pkg/constants/roles");
 
 router.get("/sales", authMiddleware([ADMIN, MANAGER, USER]), handler.getSalesReport);
 router.get("/analytics", authMiddleware([ADMIN, MANAGER, USER]), handler.getAnalytics);
