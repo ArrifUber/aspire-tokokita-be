@@ -7,6 +7,7 @@ const CreateUserRequest = (data) => ({
   email: data.email,
   password: data.password,
   companyId: data.companyId || null,
+  roleId: data.roleId || null,
 });
 
 const UpdateUserRequest = (data) => ({
@@ -14,6 +15,7 @@ const UpdateUserRequest = (data) => ({
   email: data.email,
   password: data.password,
   companyId: data.companyId,
+  roleId: data.roleId,
 });
 
 const UserResponse = (user) => ({
@@ -21,6 +23,7 @@ const UserResponse = (user) => ({
   name: user.name,
   email: user.email,
   companyId: user.companyId,
+  role: user.role ? user.role.name : null,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });
