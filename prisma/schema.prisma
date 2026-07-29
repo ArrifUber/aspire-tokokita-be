@@ -12,6 +12,42 @@ datasource db {
   provider = "postgresql"
 }
 
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  planId    String?  @map("plan_id")
+  plan      Plan?    @relation(fields: [planId], references: [id])
+  users     User[]
+  transactions Transaction[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  limitations CompanyLimitation[]
+
+  @@map("companies")
+}
+
+model CompanyLimitation {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  company   Company  @relation(fields: [companyId], references: [id])
+  limitation Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("company_limitations")
+}
+
+model Plan {
+  id        String   @id @default(uuid())
+  name      String
+  price     Float
+  companies Company[]
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("plans")
+}
+
 model Expense {
   id          String   @id @default(uuid())
   name        String
@@ -74,6 +110,9 @@ model User {
   email       String   @unique
   password    String
   companyId   String?  @map("company_id")
+  company     Company? @relation(fields: [companyId], references: [id])
+  roleId      String?  @map("role_id")
+  role        Role?    @relation(fields: [roleId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -88,6 +127,7 @@ model Transaction {
   id           String   @id @default(uuid())
   userId       String
   companyId    String?  @map("company_id")
+  company      Company? @relation(fields: [companyId], references: [id])
   customerName String?
   totalPrice   Float
   status       String
@@ -116,6 +156,14 @@ model DetailTransaction {
   boughtProducts BoughtProductDetail[]
 
   @@map("detail_transactions")
+}
+
+model Role {
+  id    String @id @default(uuid())
+  name  String @unique
+  users User[]
+
+  @@map("roles")
 }
 
 model BoughtProductDetail {

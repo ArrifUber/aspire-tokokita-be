@@ -16,12 +16,14 @@ const findAll = async () => {
 const findById = async (id) => {
   return await prisma.user.findUnique({
     where: { id },
+    include: { role: true },
   });
 };
 
 const findByEmail = async (email) => {
   return await prisma.user.findUnique({
     where: { email },
+    include: { role: true },
   });
 };
 

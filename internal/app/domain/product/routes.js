@@ -40,4 +40,3 @@ router.put("/:id", productHandler.update);
 router.delete("/:id", productHandler.remove);
 
 module.exports = router;
-

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+const companyRoutes = require("../domain/company/routes");
 const productRoutes = require("../domain/product/routes");
 const transactionRoutes = require("../domain/transaction/routes");
 const userRoutes = require("../domain/user/routes");
@@ -10,6 +11,7 @@ const reportRoutes = require("../domain/report/routes");
 const chatbotRoutes = require("../domain/chatbot/routes");
 
 // Daftarkan route domain ke path yang sesuai
+router.use("/companies", companyRoutes);
 router.use("/products", productRoutes);
 router.use("/transactions", transactionRoutes);
 router.use("/users", userRoutes);
