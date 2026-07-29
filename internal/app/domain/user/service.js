@@ -28,7 +28,12 @@ const login = async (email, password) => {
     throw error;
   }
 
-  const payload = { id: user.id, email: user.email, name: user.name };
+  const payload = {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role ? user.role.name : null,
+  };
   const accessToken = generateToken(payload);
   const refreshToken = generateRefreshToken(payload);
 

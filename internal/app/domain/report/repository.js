@@ -1,11 +1,14 @@
 const prisma = require("../../../pkg/prisma");
 
 const getTransactionsByDateRange = async (startDate, endDate) => {
+  const start = startDate ? new Date(startDate) : new Date(0);
+  const end = endDate ? new Date(endDate) : new Date();
+
   return await prisma.transaction.findMany({
     where: {
       createdAt: {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
+        gte: start,
+        lte: end,
       },
     },
     include: {
@@ -19,11 +22,14 @@ const getTransactionsByDateRange = async (startDate, endDate) => {
 };
 
 const getExpensesByDateRange = async (startDate, endDate) => {
+  const start = startDate ? new Date(startDate) : new Date(0);
+  const end = endDate ? new Date(endDate) : new Date();
+
   return await prisma.expense.findMany({
     where: {
       createdAt: {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
+        gte: start,
+        lte: end,
       },
     },
   });
