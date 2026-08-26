@@ -12,12 +12,6 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
-  await prisma.role.deleteMany();
-
-  // Create Roles
-  const adminRole = await prisma.role.create({ data: { name: "admin" } });
-  await prisma.role.create({ data: { name: "manager" } });
-  await prisma.role.create({ data: { name: "user" } });
 
   // Create User
   const user = await prisma.user.create({
@@ -25,7 +19,15 @@ async function main() {
       name: "Admin",
       email: "admin@example.com",
       password: "password123", // Should be hashed in real scenarios
-      roleId: adminRole.id,
+      role: 'OWNER',
+    },
+  });
+  const user1 = await prisma.user.create({
+    data: {
+      name: "Admin1",
+      email: "admin1@example.com",
+      password: "password123", // Should be hashed in real scenarios
+      role: 'CASHIER',
     },
   });
 

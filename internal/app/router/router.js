@@ -8,7 +8,6 @@ const userRoutes = require("../domain/user/routes");
 const categoryRoutes = require("../domain/category/routes");
 const fileRoutes = require("../domain/file/routes");
 const reportRoutes = require("../domain/report/routes");
-const roleRoutes = require("../domain/role/routes");
 const chatbotRoutes = require("../domain/chatbot/routes");
 
 // Daftarkan route domain ke path yang sesuai
@@ -16,7 +15,6 @@ router.use("/companies", companyRoutes);
 router.use("/products", productRoutes);
 router.use("/transactions", transactionRoutes);
 router.use("/users", userRoutes);
-router.use("/roles", roleRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/files", fileRoutes);
 router.use("/reports", reportRoutes);
