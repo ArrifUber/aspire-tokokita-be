@@ -5,7 +5,7 @@
 
 const prisma = require("../../../pkg/prisma");
 
-const findAll = async () => {
+const findAll = async (where ={}) => {
   // Flow: Mengambil semua data product dari database, diurutkan berdasarkan waktu pembuatan terbaru
   return await prisma.product.findMany({
     where,

@@ -20,10 +20,12 @@ const getAllProducts = async (queryParams = {}) => {
   }
 
   // 3. Filter Search (Pencarian Berdasarkan Nama ATAU Kode Produk)
-  if (search) {
-    where.OR = [{ name: { contains: search } }, { code: { contains: search } }];
-  }
-
+if (search) {
+  where.OR = [
+    { name: { contains: search, mode: "insensitive" } },
+    { code: { contains: search, mode: "insensitive" } },
+  ];
+}
   // 4. Filter Kategori
   if (categoryId) {
     where.categoryId = categoryId;

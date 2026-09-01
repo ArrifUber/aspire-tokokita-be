@@ -19,7 +19,7 @@ async function main() {
       name: "Admin",
       email: "admin@example.com",
       password: "password123", // Should be hashed in real scenarios
-      role: 'OWNER',
+      role: "OWNER",
     },
   });
   const user1 = await prisma.user.create({
@@ -27,20 +27,52 @@ async function main() {
       name: "Admin1",
       email: "admin1@example.com",
       password: "password123", // Should be hashed in real scenarios
-      role: 'CASHIER',
+      role: "CASHIER",
     },
   });
 
   // Create Categories
-  const electronics = await prisma.category.create({ data: { name: "Electronics" } });
-  const accessories = await prisma.category.create({ data: { name: "Accessories" } });
+  const electronics = await prisma.category.create({
+    data: { name: "Elektronik & Gadget" },
+  });
+
+  const defaultCategories = [
+    "Umum", // Untuk produk cepat/bebas tanpa kategori spesifik
+    "Makanan & Minuman", // Cocok untuk Mini Market, Cafe, Resto
+    "Kebutuhan Harian", // Peralatan mandi, pembersih, kebutuhan rumah
+    "Pakaian & Aksesoris", // Fashion, sepatu, tas, atau aksesoris fashion/gadget
+    "Alat Tulis & Kantor", // ATK, kertas, perlengkapan kerja/sekolah
+    "Jasa & Pelayanan", // Untuk item non-fisik (misal: jasa service, ongkir, instalasi)
+  ];
+
+  for (const name of defaultCategories) {
+    await prisma.category.upsert({
+      where: { name }, // Pastikan field name di Prisma schema bernilai @unique
+      update: {},
+      create: { name },
+    });
+  }
 
   // Create Products
   const p1 = await prisma.product.create({
-    data: { code: "P1", name: "Laptop", buyPrice: 10000000, sellPrice: 12000000, stock: 10, categoryId: electronics.id },
+    data: {
+      code: "P1",
+      name: "Laptop",
+      buyPrice: 10000000,
+      sellPrice: 12000000,
+      stock: 10,
+      categoryId: electronics.id,
+    },
   });
   const p2 = await prisma.product.create({
-    data: { code: "P2", name: "Mouse", buyPrice: 100000, sellPrice: 200000, stock: 50, categoryId: accessories.id },
+    data: {
+      code: "P2",
+      name: "Mouse",
+      buyPrice: 100000,
+      sellPrice: 200000,
+      stock: 50,
+      categoryId: electronics.id,
+    },
   });
 
   // Create Expenses
@@ -66,8 +98,24 @@ async function main() {
           paymentMethod: "CASH",
           boughtProducts: {
             create: [
-              { productId: p1.id, name: p1.name, code: p1.code, buyPrice: p1.buyPrice, sellPrice: p1.sellPrice, quantity: 1, subtotal: 12000000 },
-              { productId: p2.id, name: p2.name, code: p2.code, buyPrice: p2.buyPrice, sellPrice: p2.sellPrice, quantity: 1, subtotal: 200000 },
+              {
+                productId: p1.id,
+                name: p1.name,
+                code: p1.code,
+                buyPrice: p1.buyPrice,
+                sellPrice: p1.sellPrice,
+                quantity: 1,
+                subtotal: 12000000,
+              },
+              {
+                productId: p2.id,
+                name: p2.name,
+                code: p2.code,
+                buyPrice: p2.buyPrice,
+                sellPrice: p2.sellPrice,
+                quantity: 1,
+                subtotal: 200000,
+              },
             ],
           },
         },
