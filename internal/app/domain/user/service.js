@@ -32,7 +32,7 @@ const login = async (email, password) => {
     id: user.id,
     email: user.email,
     name: user.name,
-    role: user.role ? user.role.name : null,
+    role: user.role,
   };
   const accessToken = generateToken(payload);
   const refreshToken = generateRefreshToken(payload);

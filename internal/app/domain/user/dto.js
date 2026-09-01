@@ -23,7 +23,7 @@ const UserResponse = (user) => ({
   name: user.name,
   email: user.email,
   companyId: user.companyId,
-  role: user.role ? user.role.name : null,
+  role: user.role || 'CASHIER',
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });

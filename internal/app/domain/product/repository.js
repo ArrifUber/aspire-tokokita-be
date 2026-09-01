@@ -8,6 +8,15 @@ const prisma = require("../../../pkg/prisma");
 const findAll = async () => {
   // Flow: Mengambil semua data product dari database, diurutkan berdasarkan waktu pembuatan terbaru
   return await prisma.product.findMany({
+    where,
+    include: {
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
     orderBy: {
       createdAt: "desc",
     },
@@ -18,6 +27,14 @@ const findById = async (id) => {
   // Flow: Mencari satu data product berdasarkan ID yang unik
   return await prisma.product.findUnique({
     where: { id },
+    include: {
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
   });
 };
 

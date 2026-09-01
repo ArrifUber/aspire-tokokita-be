@@ -3,7 +3,7 @@ const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "../../.env") });
 
 const secretKey = process.env.JWT_SECRET || "your-default-secret-key";
-const accessTokenExpiry = "1h"; // Short-lived
+const accessTokenExpiry = "2h"; // Short-lived
 const refreshTokenExpiry = "7d"; // Long-lived
 
 /**

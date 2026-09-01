@@ -4,16 +4,20 @@
  */
 
 const productService = require("./service");
-const { CreateProductRequest, UpdateProductRequest, StockUpdateRequest } = require("./dto");
+const { CreateProductRequest, UpdateProductRequest, StockUpdateRequest, GetProductsRequest } = require("./dto");
 
 const getAll = async (req, res) => {
   try {
-    // Logic Flow: Memanggil service untuk mendapatkan semua product
-    const products = await productService.getAllProducts();
+    // Logic Flow: Formatting query param (search, category, status) via DTO
+    const queryParams = GetProductsRequest(req.query);
+    
+    // Memanggil service dengan query filter
+    const products = await productService.getAllProducts(queryParams);
     return res.status(200).json({
       success: true,
       data: products,
     });
+
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       success: false,
@@ -109,6 +113,24 @@ const update = async (req, res) => {
   }
 };
 
+const toggleStatus = async (req, res) => {
+  try {
+    // Logic Flow: Membalikkan status isActive (Soft Delete / Deactive)
+    const { id } = req.params;
+    const updatedProduct = await productService.toggleProductStatus(id);
+    return res.status(200).json({
+      success: true,
+      message: `Product status updated to ${updatedProduct.isActive ? 'active' : 'inactive'}`,
+      data: updatedProduct,
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const remove = async (req, res) => {
   try {
     // Logic Flow: Menghapus data berdasarkan ID yang dikirim
@@ -133,5 +155,6 @@ module.exports = {
   getById,
   create,
   update,
+  toggleStatus,
   remove,
 };

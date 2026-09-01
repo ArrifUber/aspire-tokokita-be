@@ -35,6 +35,10 @@ router.post("/", productHandler.create);
 // Deskripsi: Mengupdate data product yang sudah ada
 router.put("/:id", productHandler.update);
 
+// Endpoint: [PUT] /products/:id/toggle
+// Deskripsi: Ubah status produk (active/inactive) 
+router.patch('/:id/toggle', handler.toggleStatus); // <--- Route Soft Delete / Deactive
+
 // Endpoint: [DELETE] /products/:id
 // Deskripsi: Menghapus data product
 router.delete("/:id", productHandler.remove);

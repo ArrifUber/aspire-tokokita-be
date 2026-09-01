@@ -85,6 +85,10 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Update add minimum stock and active/inactive product
+  isActive Boolean @default(true)
+  minimumStock Int @default(5)
+
   boughtDetails BoughtProductDetail[]
   stockIncrements StockIncrement[]
 
@@ -117,7 +121,7 @@ model User {
   password    String
   companyId   String?  @map("company_id")
   company     Company? @relation(fields: [companyId], references: [id])
-  role        Role    @default(CASHIER)
+  role        Role     @default(CASHIER)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

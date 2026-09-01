@@ -11,6 +11,8 @@ const CreateProductRequest = (data) => ({
   buyPrice: parseFloat(data.buyPrice),
   sellPrice: parseFloat(data.sellPrice),
   stock: parseInt(data.stock),
+
+  minimumStock: data.minimumStock ? parseInt(data.minimumStock) : 5,
 });
 
 const UpdateProductRequest = (data) => ({
@@ -22,6 +24,9 @@ const UpdateProductRequest = (data) => ({
   buyPrice: data.buyPrice ? parseFloat(data.buyPrice) : undefined,
   sellPrice: data.sellPrice ? parseFloat(data.sellPrice) : undefined,
   stock: data.stock ? parseInt(data.stock) : undefined,
+
+  minimumStock: data.minimumStock ? parseInt(data.minimumStock) : undefined, 
+  isActive: data.isActive !== undefined ? Boolean(data.isActive) : undefined,
 });
 
 const ProductResponse = (product) => ({
@@ -35,6 +40,10 @@ const ProductResponse = (product) => ({
   buyPrice: product.buyPrice,
   sellPrice: product.sellPrice,
   stock: product.stock,
+
+  minimumStock: product.minimumStock, // <--- TAMBAHAN
+  isActive: product.isActive,         // <--- TAMBAHAN
+
   createdAt: product.createdAt,
   updatedAt: product.updatedAt,
 });
@@ -56,7 +65,16 @@ const StockResponse = (product) => ({
   category: product.category,
 });
 
+const GetProductsRequest = (query) => ({
+  search: query.search || "",
+  categoryId: query.categoryId || null,
+  isActive: query.isActive !== undefined ? query.isActive === "true" : true, // Default hanya ambil produk aktif
+  lowStock: query.lowStock === "true", // Filter stok yang <= minimumStock
+});
+
+
 module.exports = {
+  GetProductsRequest,
   CreateProductRequest,
   UpdateProductRequest,
   ProductResponse,
