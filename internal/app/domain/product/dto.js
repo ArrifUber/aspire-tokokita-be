@@ -68,7 +68,7 @@ const StockResponse = (product) => ({
 const GetProductsRequest = (query) => ({
   search: query.search || "",
   categoryId: query.categoryId || null,
-  isActive: query.isActive !== undefined ? query.isActive === "true" : true, // Default hanya ambil produk aktif
+  isActive: query.isActive === "true" ? true :  query.isActive === "false" ? false : undefined, // Default hanya ambil produk aktif
   lowStock: query.lowStock === "true", // Filter stok yang <= minimumStock
 });
 
