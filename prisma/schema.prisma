@@ -24,7 +24,6 @@ model Company {
 
   limitations CompanyLimitation[]
 
-   invoiceCounters InvoiceCounter[]
 
   @@map("companies")
 }
@@ -159,14 +158,11 @@ model Transaction {
 
 model InvoiceCounter {
   id         String   @id @default(uuid())
-  companyId  String?  @map("company_id")
-  company    Company? @relation(fields: [companyId], references: [id])
-  date       DateTime @db.Date // hanya tanggal, tanpa jam
+  date       DateTime @unique @db.Date
   lastNumber Int      @default(0) @map("last_number")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  @@unique([companyId, date])
   @@map("invoice_counters")
 }
 

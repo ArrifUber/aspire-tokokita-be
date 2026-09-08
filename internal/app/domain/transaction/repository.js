@@ -53,18 +53,12 @@ const create = async (transactionData, detailData, boughtProducts) => {
   return await prisma.$transaction(async (tx) => {
     const today = startOfDay(new Date());
     const invoicePrefix = "INV";
-    const companyId = transactionData.companyId ?? null;
 
-    // Atomic increment: upsert counter harian per company
+    // Atomic increment: upsert counter harian (global, tanpa companyId)
     const counter = await tx.invoiceCounter.upsert({
-      where: {
-        companyId_date: {
-          companyId,
-          date: today,
-        },
-      },
+      where: { date: today },
       update: { lastNumber: { increment: 1 } },
-      create: { companyId, date: today, lastNumber: 1 },
+      create: { date: today, lastNumber: 1 },
     });
 
     const sequenceNumber = counter.lastNumber;
