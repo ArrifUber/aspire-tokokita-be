@@ -1,5 +1,39 @@
 const prisma = require("../internal/pkg/prisma");
 
+// Format Date -> "yyyyMMdd"
+const formatDateForInvoice = (date) => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}${mm}${dd}`;
+};
+
+// Normalize ke jam 00:00 supaya cocok dengan kolom @db.Date di InvoiceCounter
+const startOfDay = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+// Generate invoice number sekaligus increment counter harian (global)
+async function generateInvoiceNumber(date = new Date()) {
+  const today = startOfDay(date);
+  const invoicePrefix = "INV";
+
+  const counter = await prisma.invoiceCounter.upsert({
+    where: { date: today },
+    update: { lastNumber: { increment: 1 } },
+    create: { date: today, lastNumber: 1 },
+  });
+
+  const sequenceNumber = counter.lastNumber;
+  const invoiceNumber = `${invoicePrefix}/${formatDateForInvoice(
+    today,
+  )}/${String(sequenceNumber).padStart(4, "0")}`;
+
+  return { invoiceNumber, invoicePrefix, sequenceNumber };
+}
+
 async function main() {
   console.log("🌱 Start seeding for reporting test...");
 
@@ -7,6 +41,7 @@ async function main() {
   await prisma.boughtProductDetail.deleteMany();
   await prisma.detailTransaction.deleteMany();
   await prisma.transaction.deleteMany();
+  await prisma.invoiceCounter.deleteMany();
   await prisma.expense.deleteMany();
   await prisma.stockIncrement.deleteMany();
   await prisma.product.deleteMany();
@@ -37,17 +72,17 @@ async function main() {
   });
 
   const defaultCategories = [
-    "Umum", // Untuk produk cepat/bebas tanpa kategori spesifik
-    "Makanan & Minuman", // Cocok untuk Mini Market, Cafe, Resto
-    "Kebutuhan Harian", // Peralatan mandi, pembersih, kebutuhan rumah
-    "Pakaian & Aksesoris", // Fashion, sepatu, tas, atau aksesoris fashion/gadget
-    "Alat Tulis & Kantor", // ATK, kertas, perlengkapan kerja/sekolah
-    "Jasa & Pelayanan", // Untuk item non-fisik (misal: jasa service, ongkir, instalasi)
+    "Umum",
+    "Makanan & Minuman",
+    "Kebutuhan Harian",
+    "Pakaian & Aksesoris",
+    "Alat Tulis & Kantor",
+    "Jasa & Pelayanan",
   ];
 
   for (const name of defaultCategories) {
     await prisma.category.upsert({
-      where: { name }, // Pastikan field name di Prisma schema bernilai @unique
+      where: { name },
       update: {},
       create: { name },
     });
@@ -83,12 +118,19 @@ async function main() {
     ],
   });
 
+  // Generate invoice number untuk transaksi
+  const { invoiceNumber, invoicePrefix, sequenceNumber } =
+    await generateInvoiceNumber();
+
   // Create Transaction
   const transaction = await prisma.transaction.create({
     data: {
       userId: user.id,
       totalPrice: 12200000,
       status: "SUCCESS",
+      invoiceNumber,
+      invoicePrefix,
+      sequenceNumber,
       detailTransactions: {
         create: {
           totalCapital: 10100000,
@@ -123,7 +165,7 @@ async function main() {
     },
   });
 
-  console.log("✅ Seeding finished.");
+  console.log(`✅ Seeding finished. Invoice: ${transaction.invoiceNumber}`);
 }
 
 main()

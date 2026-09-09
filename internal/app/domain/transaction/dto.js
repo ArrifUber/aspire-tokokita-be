@@ -33,6 +33,9 @@ const UpdateTransactionRequest = (data) => ({
 
 const TransactionResponse = (transaction) => ({
   id: transaction.id,
+  invoiceNumber: transaction.invoiceNumber,
+  invoicePrefix: transaction.invoicePrefix,
+  sequenceNumber: transaction.sequenceNumber,
   userId: transaction.userId,
   companyId: transaction.companyId,
   customerName: transaction.customerName,

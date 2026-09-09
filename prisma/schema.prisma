@@ -24,6 +24,7 @@ model Company {
 
   limitations CompanyLimitation[]
 
+
   @@map("companies")
 }
 
@@ -143,10 +144,26 @@ model Transaction {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  // === INVOICE NUMBER ===
+
+  invoiceNumber   String   @unique @map("invoice_number") // hasil akhir: INV/20260902/TK01/0142
+  invoicePrefix   String   @default("INV") @map("invoice_prefix")
+  sequenceNumber  Int      @map("sequence_number") // nomor urut harian, contoh: 142
+
   user               User                @relation(fields: [userId], references: [id])
   detailTransactions DetailTransaction[]
 
   @@map("transactions")
+}
+
+model InvoiceCounter {
+  id         String   @id @default(uuid())
+  date       DateTime @unique @db.Date
+  lastNumber Int      @default(0) @map("last_number")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("invoice_counters")
 }
 
 model DetailTransaction {
