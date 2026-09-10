@@ -13,37 +13,38 @@ datasource db {
 }
 
 model Company {
-  id        String   @id @default(uuid())
-  name      String
-  planId    String?  @map("plan_id")
-  plan      Plan?    @relation(fields: [planId], references: [id])
-  users     User[]
+  id           String        @id @default(uuid())
+  name         String
+  planId       String?       @map("plan_id")
+  plan         Plan?         @relation(fields: [planId], references: [id])
+  users        User[]
   transactions Transaction[]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
 
   limitations CompanyLimitation[]
+  vendors     Vendor[]
 
   @@map("companies")
 }
 
 model CompanyLimitation {
-  id        String   @id @default(uuid())
-  companyId String   @map("company_id")
-  company   Company  @relation(fields: [companyId], references: [id])
+  id         String   @id @default(uuid())
+  companyId  String   @map("company_id")
+  company    Company  @relation(fields: [companyId], references: [id])
   limitation Json
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@map("company_limitations")
 }
 
 model Plan {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
   price     Float
   companies Company[]
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   @@map("plans")
 }
@@ -66,7 +67,7 @@ model Category {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  products    Product[]
+  products Product[]
 
   @@map("categories")
 }
@@ -86,10 +87,10 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // Update add minimum stock and active/inactive product
-  isActive Boolean @default(true)
-  minimumStock Int @default(5)
+  isActive     Boolean @default(true)
+  minimumStock Int     @default(5)
 
-  boughtDetails BoughtProductDetail[]
+  boughtDetails   BoughtProductDetail[]
   stockIncrements StockIncrement[]
 
   @@map("products")
@@ -102,8 +103,8 @@ model StockIncrement {
   quantity  Int
   createdAt DateTime @default(now())
 
-  product   Product  @relation(fields: [productId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
   @@map("stock_increments")
 }
@@ -115,15 +116,15 @@ enum Role {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  name        String
-  email       String   @unique
-  password    String
-  companyId   String?  @map("company_id")
-  company     Company? @relation(fields: [companyId], references: [id])
-  role        Role     @default(CASHIER)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  companyId String?  @map("company_id")
+  company   Company? @relation(fields: [companyId], references: [id])
+  role      Role     @default(CASHIER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   transactions    Transaction[]
   stockIncrements StockIncrement[]
@@ -150,18 +151,18 @@ model Transaction {
 }
 
 model DetailTransaction {
-  id                String   @id @default(uuid())
-  transactionId     String
-  totalCapital      Float
-  totalProfit       Float
-  discount          Float    @default(0)
-  paymentAmount     Float
-  changeAmount      Float
-  paymentMethod     String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id            String   @id @default(uuid())
+  transactionId String
+  totalCapital  Float
+  totalProfit   Float
+  discount      Float    @default(0)
+  paymentAmount Float
+  changeAmount  Float
+  paymentMethod String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  transaction   Transaction           @relation(fields: [transactionId], references: [id])
+  transaction    Transaction           @relation(fields: [transactionId], references: [id])
   boughtProducts BoughtProductDetail[]
 
   @@map("detail_transactions")
@@ -193,8 +194,8 @@ model Conversation {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages Message[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
   summaries Summary[]
 
   @@map("conversations")
@@ -237,4 +238,37 @@ model Attachment {
   message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@map("attachments")
+}
+
+model Vendor {
+  id        String @id @default(uuid())
+  companyId String @map("company_id")
+
+  name String // Company name
+  code String? // Contoh: VND-001
+  type String? @default("SUPPLIER") // SUPPLIER, SERVICE, OPERATIONAL, LOGISTICS
+
+  picName  String? @map("pic_name")
+  picPhone String? @map("pic_phone")
+  email    String? @map("email")
+
+  // Data Pembayaran & Bank
+  bankName          String? @map("bank_name")
+  bankAccountNumber String? @map("bank_account_number")
+  bankAccountHolder String? @map("bank_account_holder")
+  paymentTerm       String? @default("CASH") @map("payment_term") // CASH, NET_7, NET_30, dll
+
+  isActive  Boolean  @default(false) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  company Company? @relation(fields: [companyId], references: [id])
+
+  // Yang ingin ditambah cuma belum tahu pengen jadi
+  // picName           String?  @map("pic_name")
+  // address   String?
+  // city      String?
+  // stockIncrements StockIncrement[] // Jika ingin tahu barang masuk berasal dari vendor mana
+  // expenses        Expense[]        // Jika ada pengeluaran yang ditujukan ke vendor ini
+  @@map("vendors")
 }

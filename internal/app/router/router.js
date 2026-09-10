@@ -9,7 +9,7 @@ const categoryRoutes = require("../domain/category/routes");
 const fileRoutes = require("../domain/file/routes");
 const reportRoutes = require("../domain/report/routes");
 const chatbotRoutes = require("../domain/chatbot/routes");
-const supplierRoutes = require("../domain/supplier/routes");
+const vendorRoutes = require("../domain/vendor/routes");
 
 // Daftarkan route domain ke path yang sesuai
 router.use("/companies", companyRoutes);
@@ -20,6 +20,6 @@ router.use("/categories", categoryRoutes);
 router.use("/files", fileRoutes);
 router.use("/reports", reportRoutes);
 router.use("/chatbot", chatbotRoutes);
-router.use("/supplier", supplierRoutes)
+router.use("/vendor", vendorRoutes)
 
 module.exports = router;
