@@ -23,8 +23,8 @@ model Company {
   updatedAt    DateTime      @updatedAt @map("updated_at")
 
   limitations CompanyLimitation[]
-  vendors     Vendor[]
 
+  // vendors     Vendor[]
   @@map("companies")
 }
 
@@ -241,34 +241,20 @@ model Attachment {
 }
 
 model Vendor {
-  id        String @id @default(uuid())
-  companyId String @map("company_id")
-
+  id   String @id @default(uuid())
   name String // Company name
-  code String? // Contoh: VND-001
-  type String? @default("SUPPLIER") // SUPPLIER, SERVICE, OPERATIONAL, LOGISTICS
 
   picName  String? @map("pic_name")
   picPhone String? @map("pic_phone")
-  email    String? @map("email")
 
-  // Data Pembayaran & Bank
-  bankName          String? @map("bank_name")
-  bankAccountNumber String? @map("bank_account_number")
-  bankAccountHolder String? @map("bank_account_holder")
-  paymentTerm       String? @default("CASH") @map("payment_term") // CASH, NET_7, NET_30, dll
+  rekening   String? @map("bank_name")
+  noRekening String? @map("no_rekening")
 
-  isActive  Boolean  @default(false) @map("is_active")
+  jumlahProduk Int?    @default(0) @map("jumlah_produk")
+  isActive     Boolean @default(false) @map("is_active") // status
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  company Company? @relation(fields: [companyId], references: [id])
-
-  // Yang ingin ditambah cuma belum tahu pengen jadi
-  // picName           String?  @map("pic_name")
-  // address   String?
-  // city      String?
-  // stockIncrements StockIncrement[] // Jika ingin tahu barang masuk berasal dari vendor mana
-  // expenses        Expense[]        // Jika ada pengeluaran yang ditujukan ke vendor ini
   @@map("vendors")
 }
