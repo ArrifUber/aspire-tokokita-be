@@ -75,6 +75,26 @@ async function main() {
     },
   });
 
+  // Create Vendor
+  const ven1 = await prisma.vendor.create({
+    data: {
+      name: "PT Anggrek Mekar",
+      picName: "PIC 1",
+      picPhone: "08123456789",
+      rekening: "Bank Manja",
+      noRekening: "123456789",
+    },
+  });
+  const ven2 = await prisma.vendor.create({
+    data: {
+      name: "PT Toya Mas Amba",
+      picName: "PIC 2",
+      picPhone: "08123456789",
+      rekening: "ABC",
+      noRekening: "123456789",
+    },
+  });
+
   // Create Expenses
   await prisma.expense.createMany({
     data: [
