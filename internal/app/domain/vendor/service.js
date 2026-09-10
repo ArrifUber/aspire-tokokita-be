@@ -8,6 +8,10 @@ const getAll = async () => {
   return await repository.getAll();
 }
 
+const getById = async (id) => {
+  return await repository.getById(id);
+}
+
 const create = async (data) => {
   const payload = CreateVendorRequest(data);
   return await repository.create(payload);
@@ -19,5 +23,6 @@ const create = async (data) => {
 
 module.exports = { 
   getAll, 
-  create
+  create,
+  getById
 }

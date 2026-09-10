@@ -7,6 +7,8 @@ const vendorHandler = require("./handler");
 
 router.get("/", vendorHandler.getAll);
 
+router.get("/:id", vendorHandler.getById);
+
 router.post("/create", vendorHandler.create);
 
 // router.put("/edit/:id", vendorHandler.edit);

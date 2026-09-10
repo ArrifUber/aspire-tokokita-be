@@ -16,6 +16,23 @@ const getAll = async (req, res) => {
   }
 };
 
+const getById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await service.getById(id)
+    return res.status(200).json({
+      success: true,
+      message: data ? "Data successfully retrieved!" : "Data tidak ditemukan!",
+      data: data || null
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    })
+  }
+};
+
 const create = async (req, res) => {
   try {
     const data = req.body;
@@ -31,7 +48,7 @@ const create = async (req, res) => {
       message: error.message,
     })
   }
-}
+};
 
 // const edit = (req, res) => {
 //   const { id } = req.params;
@@ -60,6 +77,7 @@ const create = async (req, res) => {
 module.exports = {
   getAll,
   create,
+  getById
   // edit,
   // detail,
   // remove
