@@ -4,9 +4,9 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "jest",
+    "test": "test",
     "seed": "node prisma/seed.js",
-    "dev": "node cmd/main.js"
+    "dev": "sudo docker compose -f 'docker-compose.yml' up -d --build && node cmd/main.js"
   },
   "keywords": [],
   "author": "",

@@ -250,7 +250,7 @@ model Vendor {
   rekening   String? @map("bank_name")
   noRekening String? @map("no_rekening")
 
-  jumlahProduk Int?    @default(0) @map("jumlah_produk")
+  jumlahProduk Int?    @default(1) @map("jumlah_produk")
   isActive     Boolean @default(false) @map("is_active") // status
 
   createdAt DateTime @default(now()) @map("created_at")
