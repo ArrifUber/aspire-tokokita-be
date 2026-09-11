@@ -61,6 +61,8 @@ const createTransaction = async (transactionData) => {
     });
   }
 
+  // invoiceNumber, invoicePrefix, sequenceNumber di-generate secara atomic
+  // di dalam transactionRepository.create()
   const newTransaction = await transactionRepository.create(
     headerData,
     detailFields,
