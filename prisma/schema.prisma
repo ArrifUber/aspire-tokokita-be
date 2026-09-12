@@ -73,18 +73,24 @@ model Category {
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  code        String   @unique
-  name        String
-  description String?
-  image       String?
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  buyPrice    Float
-  sellPrice   Float
-  stock       Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String   @id @default(uuid())
+  code             String   @unique
+  description      String?
+  image            String?
+  categoryId       String
+  category         Category @relation(fields: [categoryId], references: [id])
+  name             String
+  type             String?  @default("BUY_OUTRIGHT") // BUY_OUTRIGHT | CONSIGNMENT
+  vendorId         String?  @map("vendor_id")
+  vendor           Vendor?  @relation(fields: [vendorId], references: [id])
+  commisionPercent Float    @default(0) @map("commision_percent")
+
+  // buyPrice          Float
+  sellPrice Float
+
+  stock     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Update add minimum stock and active/inactive product
   isActive     Boolean @default(true)
@@ -144,10 +150,26 @@ model Transaction {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  // === INVOICE NUMBER ===
+
+  invoiceNumber  String @unique @map("invoice_number") // hasil akhir: INV/20260902/TK01/0142
+  invoicePrefix  String @default("INV") @map("invoice_prefix")
+  sequenceNumber Int    @map("sequence_number") // nomor urut harian, contoh: 142
+
   user               User                @relation(fields: [userId], references: [id])
   detailTransactions DetailTransaction[]
 
   @@map("transactions")
+}
+
+model InvoiceCounter {
+  id         String   @id @default(uuid())
+  date       DateTime @unique @db.Date
+  lastNumber Int      @default(0) @map("last_number")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("invoice_counters")
 }
 
 model DetailTransaction {
@@ -253,8 +275,9 @@ model Vendor {
   jumlahProduk Int?    @default(0) @map("jumlah_produk")
   isActive     Boolean @default(false) @map("is_active") // status
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  products  Product[]
 
   @@map("vendors")
 }
