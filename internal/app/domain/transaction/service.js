@@ -6,6 +6,10 @@ const transactionRepository = require("./repository");
 const productRepository = require("../product/repository");
 const { TransactionResponse } = require("./dto");
 
+const calculateCommission = (sellPrice, quantity, commissionPercent) => {
+  return Math.round(sellPrice * quantity * commissionPercent);
+};
+
 const getAllTransactions = async () => {
   const transactions = await transactionRepository.findAll();
   return transactions.map((transaction) => TransactionResponse(transaction));
@@ -26,6 +30,7 @@ const createTransaction = async (transactionData) => {
   const { products: requestProducts, ...detailFields } = detail;
 
   const boughtProducts = [];
+  let totalCommission = 0
 
   // Process each product: Fetch current info, check stock, and prepare snapshot
   for (const item of requestProducts) {
@@ -44,13 +49,22 @@ const createTransaction = async (transactionData) => {
       throw error;
     }
 
+
+    const commission = calculateCommission(
+      product.sellPrice,
+      item.quantity,
+      product.commissionPercent,
+    );
+    totalCommission += commission;
+
     // Prepare historical snapshot for this transaction
     boughtProducts.push({
       productId: product.id,
+      vendorId: product.vendorId,
       name: product.name,
       code: product.code,
-      buyPrice: product.buyPrice,
       sellPrice: product.sellPrice,
+      commissionPercent: product.commissionPercent,
       quantity: item.quantity,
       subtotal: product.sellPrice * item.quantity,
     });
@@ -63,9 +77,9 @@ const createTransaction = async (transactionData) => {
 
   // invoiceNumber, invoicePrefix, sequenceNumber di-generate secara atomic
   // di dalam transactionRepository.create()
-  const newTransaction = await transactionRepository.create(
+    const newTransaction = await transactionRepository.create(
     headerData,
-    detailFields,
+    { ...detailFields, totalCommission },
     boughtProducts,
   );
   return TransactionResponse(newTransaction);

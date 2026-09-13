@@ -313,7 +313,7 @@ async function main() {
     });
   }
 
-  // === CONTOH TRANSAKSI ===
+ // === CONTOH TRANSAKSI ===
   const { invoiceNumber, invoicePrefix, sequenceNumber } =
     await generateInvoiceNumber();
 
@@ -321,6 +321,16 @@ async function main() {
   const p2 = products["SP-001"]; // Sneakers
 
   const totalPrice = p1.sellPrice * 1 + p2.sellPrice * 1;
+
+  // Hitung komisi per item (snapshot saat transaksi terjadi)
+  // commissionPercent disimpan desimal (0.05 = 5%), jadi tinggal dikali langsung
+  const calculateCommission = (sellPrice, quantity, commissionPercent) => {
+    return Math.round(sellPrice * quantity * commissionPercent);
+  }
+
+  const p1Commission = calculateCommission(p1.sellPrice, 1, p1.commissionPercent);
+  const p2Commission = calculateCommission(p2.sellPrice, 1, p2.commissionPercent);
+  const totalCommission = p1Commission + p2Commission;
 
   const transaction = await prisma.transaction.create({
     data: {
@@ -333,8 +343,7 @@ async function main() {
       sequenceNumber,
       detailTransactions: {
         create: {
-          totalCapital: 0, // isi manual jika ada data harga modal
-          totalProfit: 0,
+          totalCommission,
           paymentAmount: totalPrice,
           changeAmount: 0,
           paymentMethod: "CASH",
@@ -342,17 +351,21 @@ async function main() {
             create: [
               {
                 productId: p1.id,
+                vendorId: p1.vendorId,
                 name: p1.name,
                 code: p1.code,
                 sellPrice: p1.sellPrice,
+                commissionPercent: p1.commissionPercent,
                 quantity: 1,
                 subtotal: p1.sellPrice,
               },
               {
                 productId: p2.id,
+                vendorId: p2.vendorId,
                 name: p2.name,
                 code: p2.code,
                 sellPrice: p2.sellPrice,
+                commissionPercent: p2.commissionPercent,
                 quantity: 1,
                 subtotal: p2.sellPrice,
               },

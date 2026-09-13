@@ -174,8 +174,7 @@ model InvoiceCounter {
 model DetailTransaction {
   id            String   @id @default(uuid())
   transactionId String
-  totalCapital  Float
-  totalProfit   Float
+  totalCommission Float  @default(0) @map("total_commission") 
   discount      Float    @default(0)
   paymentAmount Float
   changeAmount  Float
@@ -193,10 +192,11 @@ model BoughtProductDetail {
   id                  String   @id @default(uuid())
   detailTransactionId String
   productId           String
+  vendorId            String?  @map("vendor_id") 
   name                String // Snapshot name
   code                String // Snapshot code
-  // buyPrice            Float // Snapshot buy price
   sellPrice           Float // Snapshot sell price
+  commissionPercent   Float    @default(0) @map("commission_percent") // snapshot komisi saat transaksi
   quantity            Int
   subtotal            Float
   createdAt           DateTime @default(now())
@@ -272,7 +272,7 @@ model Vendor {
   noRekening String @map("no_rekening")
 
   jumlahProduk Int   @default(0) @map("jumlah_produk")
-  // isActive     Boolean @default(false) @map("is_active") // status
+  isActive     Boolean @default(true) @map("is_active") // status
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
