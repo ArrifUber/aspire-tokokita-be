@@ -1,4 +1,68 @@
+const fs = require("fs");
+const path = require("path");
 const prisma = require("../internal/pkg/prisma");
+// Sesuaikan path ini kalau lokasi file seed.js kamu bukan di folder "prisma/"
+// yang sejajar dengan folder "internal/"
+const minioClient = require("../internal/pkg/minio");
+
+const BUCKET_NAME = process.env.MINIO_BUCKET_NAME || "uploads";
+
+// Folder tempat menaruh gambar produk untuk keperluan seeding.
+// Nama file HARUS sama dengan `code` produk, contoh: PP-001.jpg
+const PRODUCT_ASSETS_DIR = path.join(__dirname, "assets", "products");
+
+const MIME_TYPES = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+};
+
+const ensureBucket = async () => {
+  const exists = await minioClient.bucketExists(BUCKET_NAME);
+  if (!exists) {
+    await minioClient.makeBucket(BUCKET_NAME);
+  }
+};
+
+// Cari file gambar berdasarkan productCode di PRODUCT_ASSETS_DIR,
+// lalu upload ke MinIO. Mengembalikan objectName (untuk disimpan di field `image`)
+// atau null kalau file tidak ditemukan / gagal upload.
+const uploadProductImage = async (productCode) => {
+  const supportedExt = Object.keys(MIME_TYPES);
+  const foundExt = supportedExt.find((ext) =>
+    fs.existsSync(path.join(PRODUCT_ASSETS_DIR, `${productCode}${ext}`)),
+  );
+
+  if (!foundExt) {
+    console.warn(
+      `⚠️  Gambar untuk produk "${productCode}" tidak ditemukan di ${PRODUCT_ASSETS_DIR}, dilewati.`,
+    );
+    return null;
+  }
+
+  const filePath = path.join(PRODUCT_ASSETS_DIR, `${productCode}${foundExt}`);
+  const objectName = `${productCode}${foundExt}`;
+
+  try {
+    await ensureBucket();
+    const buffer = fs.readFileSync(filePath);
+    const metaData = { "Content-Type": MIME_TYPES[foundExt] };
+    await minioClient.putObject(
+      BUCKET_NAME,
+      objectName,
+      buffer,
+      buffer.length,
+      metaData,
+    );
+    return objectName;
+  } catch (error) {
+    console.warn(
+      `⚠️  Gagal upload gambar untuk produk "${productCode}": ${error.message}`,
+    );
+    return null;
+  }
+};
 
 // Format Date -> "yyyyMMdd"
 const formatDateForInvoice = (date) => {
@@ -95,7 +159,8 @@ async function main() {
       picPhone: "081234567801",
       rekening: "Bank BCA",
       noRekening: "1110022003",
-      isActive: true
+            isActive: true
+
     },
   });
 
@@ -106,7 +171,8 @@ async function main() {
       picPhone: "081234567802",
       rekening: "Bank Mandiri",
       noRekening: "2220033004",
-      isActive: true
+            isActive: true
+
     },
   });
 
@@ -233,7 +299,8 @@ async function main() {
 
   const products = {};
   for (const p of productData) {
-    const created = await prisma.product.create({ data: p });
+    const image = await uploadProductImage(p.code);
+    const created = await prisma.product.create({ data: { ...p, image } });
     products[p.code] = created;
   }
 
