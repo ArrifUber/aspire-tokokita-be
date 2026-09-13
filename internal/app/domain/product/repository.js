@@ -40,6 +40,12 @@ const findById = async (id) => {
           name: true,
         },
       },
+            vendor: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 };
