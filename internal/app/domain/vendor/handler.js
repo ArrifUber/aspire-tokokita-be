@@ -2,7 +2,7 @@ const service = require('./service')
 
 const getAll = async (req, res) => {
   try {
-    const data = await service.getAll();
+    const data = await service.getAllVendors();
 
     return res.status(200).json({
       success: true,
@@ -19,7 +19,7 @@ const getAll = async (req, res) => {
 const getById = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await service.getById(id)
+    const data = await service.getVendorById(id)
     return res.status(200).json({
       success: true,
       message: data ? "Data successfully retrieved!" : "Data tidak ditemukan!",
@@ -36,7 +36,7 @@ const getById = async (req, res) => {
 const create = async (req, res) => {
   try {
     const data = req.body;
-    const vendorCreate = await service.create(data);
+    const vendorCreate = await service.createVendor(data);
     return res.status(200).json({
       success: true,
       message: "Data successfully created!",

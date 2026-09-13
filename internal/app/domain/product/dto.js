@@ -8,9 +8,10 @@ const CreateProductRequest = (data) => ({
   description: data.description || null,
   image: data.image || null,
   categoryId: data.categoryId,
-  buyPrice: parseFloat(data.buyPrice),
   sellPrice: parseFloat(data.sellPrice),
   stock: parseInt(data.stock),
+  vendorId: data.vendorId,
+  commissionPercent: data.commissionPercent,
 
   minimumStock: data.minimumStock ? parseInt(data.minimumStock) : 5,
 });
@@ -21,9 +22,11 @@ const UpdateProductRequest = (data) => ({
   description: data.description,
   image: data.image,
   categoryId: data.categoryId,
-  buyPrice: data.buyPrice ? parseFloat(data.buyPrice) : undefined,
   sellPrice: data.sellPrice ? parseFloat(data.sellPrice) : undefined,
   stock: data.stock ? parseInt(data.stock) : undefined,
+
+  vendorId: data.vendorId,
+  commissionPercent: data.commissionPercent,
 
   minimumStock: data.minimumStock ? parseInt(data.minimumStock) : undefined, 
   isActive: data.isActive !== undefined ? Boolean(data.isActive) : undefined,
@@ -35,14 +38,16 @@ const ProductResponse = (product) => ({
   name: product.name,
   description: product.description,
   image: product.image,
-  categoryId: product.categoryId,
   category: product.category,
-  buyPrice: product.buyPrice,
   sellPrice: product.sellPrice,
   stock: product.stock,
 
   minimumStock: product.minimumStock, // <--- TAMBAHAN
   isActive: product.isActive,         // <--- TAMBAHAN
+
+  vendor: product.vendor,
+
+  commissionPercent: product.commissionPercent,
 
   createdAt: product.createdAt,
   updatedAt: product.updatedAt,
@@ -60,7 +65,6 @@ const StockUpdateRequest = (data) => {
 
 const StockResponse = (product) => ({
   name: product.name,
-  buyPrice: product.buyPrice,
   stock: product.stock,
   category: product.category,
 });

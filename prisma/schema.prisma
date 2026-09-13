@@ -12,53 +12,53 @@ datasource db {
   provider = "postgresql"
 }
 
-model Company {
-  id           String        @id @default(uuid())
-  name         String
-  planId       String?       @map("plan_id")
-  plan         Plan?         @relation(fields: [planId], references: [id])
-  users        User[]
-  transactions Transaction[]
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+// model Company {
+//   id           String        @id @default(uuid())
+//   name         String
+//   planId       String?       @map("plan_id")
+//   plan         Plan?         @relation(fields: [planId], references: [id])
+//   users        User[]
+//   transactions Transaction[]
+//   createdAt    DateTime      @default(now()) @map("created_at")
+//   updatedAt    DateTime      @updatedAt @map("updated_at")
 
-  limitations CompanyLimitation[]
+//   limitations CompanyLimitation[]
 
-  // vendors     Vendor[]
-  @@map("companies")
-}
+//   // vendors     Vendor[]
+//   @@map("companies")
+// }
 
-model CompanyLimitation {
-  id         String   @id @default(uuid())
-  companyId  String   @map("company_id")
-  company    Company  @relation(fields: [companyId], references: [id])
-  limitation Json
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+// model CompanyLimitation {
+//   id         String   @id @default(uuid())
+//   companyId  String   @map("company_id")
+//   company    Company  @relation(fields: [companyId], references: [id])
+//   limitation Json
+//   createdAt  DateTime @default(now()) @map("created_at")
+//   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  @@map("company_limitations")
-}
+//   @@map("company_limitations")
+// }
 
-model Plan {
-  id        String    @id @default(uuid())
-  name      String
-  price     Float
-  companies Company[]
-  createdAt DateTime  @default(now()) @map("created_at")
+// model Plan {
+//   id        String    @id @default(uuid())
+//   name      String
+//   price     Float
+//   companies Company[]
+//   createdAt DateTime  @default(now()) @map("created_at")
 
-  @@map("plans")
-}
+//   @@map("plans")
+// }
 
-model Expense {
-  id          String   @id @default(uuid())
-  name        String
-  amount      Float
-  category    String?
-  description String?
-  createdAt   DateTime @default(now())
+// model Expense {
+//   id          String   @id @default(uuid())
+//   name        String
+//   amount      Float
+//   category    String?
+//   description String?
+//   createdAt   DateTime @default(now())
 
-  @@map("expenses")
-}
+//   @@map("expenses")
+// }
 
 model Category {
   id          String   @id @default(uuid())
@@ -80,10 +80,9 @@ model Product {
   categoryId       String
   category         Category @relation(fields: [categoryId], references: [id])
   name             String
-  type             String?  @default("BUY_OUTRIGHT") // BUY_OUTRIGHT | CONSIGNMENT
   vendorId         String?  @map("vendor_id")
   vendor           Vendor?  @relation(fields: [vendorId], references: [id])
-  commisionPercent Float    @default(0) @map("commision_percent")
+  commissionPercent Float    @default(0) @map("commission_percent")
 
   // buyPrice          Float
   sellPrice Float
@@ -126,8 +125,8 @@ model User {
   name      String
   email     String   @unique
   password  String
-  companyId String?  @map("company_id")
-  company   Company? @relation(fields: [companyId], references: [id])
+  // companyId String?  @map("company_id")
+  // company   Company? @relation(fields: [companyId], references: [id])
   role      Role     @default(CASHIER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -142,8 +141,8 @@ model User {
 model Transaction {
   id           String   @id @default(uuid())
   userId       String
-  companyId    String?  @map("company_id")
-  company      Company? @relation(fields: [companyId], references: [id])
+  // companyId    String?  @map("company_id")
+  // company      Company? @relation(fields: [companyId], references: [id])
   customerName String?
   totalPrice   Float
   status       String
@@ -196,7 +195,7 @@ model BoughtProductDetail {
   productId           String
   name                String // Snapshot name
   code                String // Snapshot code
-  buyPrice            Float // Snapshot buy price
+  // buyPrice            Float // Snapshot buy price
   sellPrice           Float // Snapshot sell price
   quantity            Int
   subtotal            Float
@@ -266,14 +265,14 @@ model Vendor {
   id   String @id @default(uuid())
   name String // Company name
 
-  picName  String? @map("pic_name")
-  picPhone String? @map("pic_phone")
+  picName  String @map("pic_name")
+  picPhone String @map("pic_phone")
 
-  rekening   String? @map("bank_name")
-  noRekening String? @map("no_rekening")
+  rekening   String @map("bank_name")
+  noRekening String @map("no_rekening")
 
-  jumlahProduk Int?    @default(0) @map("jumlah_produk")
-  isActive     Boolean @default(false) @map("is_active") // status
+  jumlahProduk Int   @default(0) @map("jumlah_produk")
+  // isActive     Boolean @default(false) @map("is_active") // status
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")

@@ -16,6 +16,12 @@ const findAll = async (where ={}) => {
           name: true,
         },
       },
+      vendor: {
+        select: {
+          id: true,
+          name: true,
+        },
+      }
     },
     orderBy: {
       createdAt: "desc",
