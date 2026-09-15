@@ -12,54 +12,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// model Company {
-//   id           String        @id @default(uuid())
-//   name         String
-//   planId       String?       @map("plan_id")
-//   plan         Plan?         @relation(fields: [planId], references: [id])
-//   users        User[]
-//   transactions Transaction[]
-//   createdAt    DateTime      @default(now()) @map("created_at")
-//   updatedAt    DateTime      @updatedAt @map("updated_at")
-
-//   limitations CompanyLimitation[]
-
-//   // vendors     Vendor[]
-//   @@map("companies")
-// }
-
-// model CompanyLimitation {
-//   id         String   @id @default(uuid())
-//   companyId  String   @map("company_id")
-//   company    Company  @relation(fields: [companyId], references: [id])
-//   limitation Json
-//   createdAt  DateTime @default(now()) @map("created_at")
-//   updatedAt  DateTime @updatedAt @map("updated_at")
-
-//   @@map("company_limitations")
-// }
-
-// model Plan {
-//   id        String    @id @default(uuid())
-//   name      String
-//   price     Float
-//   companies Company[]
-//   createdAt DateTime  @default(now()) @map("created_at")
-
-//   @@map("plans")
-// }
-
-// model Expense {
-//   id          String   @id @default(uuid())
-//   name        String
-//   amount      Float
-//   category    String?
-//   description String?
-//   createdAt   DateTime @default(now())
-
-//   @@map("expenses")
-// }
-
 model Category {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -84,14 +36,12 @@ model Product {
   vendor           Vendor?  @relation(fields: [vendorId], references: [id])
   commissionPercent Float    @default(0) @map("commission_percent")
 
-  // buyPrice          Float
   sellPrice Float
 
   stock     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Update add minimum stock and active/inactive product
   isActive     Boolean @default(true)
   minimumStock Int     @default(5)
 
@@ -125,8 +75,6 @@ model User {
   name      String
   email     String   @unique
   password  String
-  // companyId String?  @map("company_id")
-  // company   Company? @relation(fields: [companyId], references: [id])
   role      Role     @default(CASHIER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -141,8 +89,6 @@ model User {
 model Transaction {
   id           String   @id @default(uuid())
   userId       String
-  // companyId    String?  @map("company_id")
-  // company      Company? @relation(fields: [companyId], references: [id])
   customerName String?
   totalPrice   Float
   status       String
@@ -199,12 +145,38 @@ model BoughtProductDetail {
   commissionPercent   Float    @default(0) @map("commission_percent") // snapshot komisi saat transaksi
   quantity            Int
   subtotal            Float
+  settlementId        String?  @map("settlement_id") // null = belum di-settle
   createdAt           DateTime @default(now())
 
   detailTransaction DetailTransaction @relation(fields: [detailTransactionId], references: [id])
   product           Product           @relation(fields: [productId], references: [id])
+  settlement        VendorSettlement? @relation(fields: [settlementId], references: [id])
 
   @@map("bought_product_details")
+}
+
+enum SettlementStatus {
+  UNPAID
+  PAID
+}
+
+model VendorSettlement {
+  id              String   @id @default(uuid())
+  vendorId        String   @map("vendor_id")
+  periodStart     DateTime @map("period_start")
+  periodEnd       DateTime @map("period_end")
+  totalSales      Float    @map("total_sales")       // total penjualan kotor (sellPrice x qty)
+  totalCommission Float    @map("total_commission")  // komisi yang diambil toko
+  totalPayout     Float    @map("total_payout")      // yang dibayar ke vendor (totalSales - totalCommission)
+  status          SettlementStatus @default(UNPAID)
+  paidAt          DateTime? @map("paid_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  vendor          Vendor                @relation(fields: [vendorId], references: [id])
+  boughtProducts  BoughtProductDetail[]
+
+  @@map("vendor_settlements")
 }
 
 model Conversation {
@@ -277,6 +249,8 @@ model Vendor {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   products  Product[]
+
+  settlements VendorSettlement[]
 
   @@map("vendors")
 }
