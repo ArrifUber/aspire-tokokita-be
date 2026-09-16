@@ -70,8 +70,17 @@ const SettlementResponse = (settlement) => ({
     : [],
 });
 
+const VendorAttentionResponse = (data) => ({
+  vendorId: data.vendorId,
+  vendorName: data.vendorName,
+  unprocessedAmount: data.unprocessedAmount,
+  unpaidAmount: data.unpaidAmount,
+  unpaidSettlementCount: data.unpaidSettlementCount,
+});
+
 module.exports = {
   CreateSettlementRequest,
   SettlementPreviewResponse,
   SettlementResponse,
+  VendorAttentionResponse
 };

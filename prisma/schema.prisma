@@ -151,6 +151,7 @@ model BoughtProductDetail {
   detailTransaction DetailTransaction @relation(fields: [detailTransactionId], references: [id])
   product           Product           @relation(fields: [productId], references: [id])
   settlement        VendorSettlement? @relation(fields: [settlementId], references: [id])
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
 
   @@map("bought_product_details")
 }
@@ -251,6 +252,7 @@ model Vendor {
   products  Product[]
 
   settlements VendorSettlement[]
+  boughtProducts BoughtProductDetail[]
 
   @@map("vendors")
 }

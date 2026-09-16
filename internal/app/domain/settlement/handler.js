@@ -99,10 +99,24 @@ const pay = async (req, res) => {
   }
 };
 
+
+const getVendorsNeedingAttention = async (req, res) => {
+  try {
+    const vendors = await settlementService.getVendorsNeedingAttention();
+    return res.status(200).json({ success: true, data: vendors });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   preview,
   getAll,
   getById,
   create,
   pay,
+  getVendorsNeedingAttention
 };

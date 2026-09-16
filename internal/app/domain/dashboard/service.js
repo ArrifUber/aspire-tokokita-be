@@ -80,8 +80,8 @@ const getTopProducts = async (limit = 5) => {
 };
 
 const getSettlementStatus = async () => {
-  const counts = await dashboardRepository.getSettlementStatusCount();
-  return SettlementStatusResponse(counts);
+  const coverage = await dashboardRepository.getVendorSettlementCoverage();
+  return SettlementStatusResponse(coverage);
 };
 
 const getRecentTransactions = async (limit = 5) => {

@@ -7,6 +7,8 @@ const vendorRepository = require("../vendor/respository"); // sesuaikan kalau pa
 const {
   SettlementResponse,
   SettlementPreviewResponse,
+  VendorAttentionResponse,
+  CreateSettlementRequest
 } = require("./dto");
 
 // commissionPercent disimpan desimal (0.05 = 5%), tinggal dikali langsung
@@ -138,10 +140,53 @@ const markSettlementAsPaid = async (id) => {
   return SettlementResponse(updated);
 };
 
+const getVendorsNeedingAttention = async () => {
+  const [unprocessed, unpaid] = await Promise.all([
+    settlementRepository.getUnprocessedByVendor(),
+    settlementRepository.getUnpaidByVendor(),
+  ]);
+
+  // Gabungkan dua sumber data jadi satu map per vendor
+  const map = {};
+
+  unprocessed.forEach((v) => {
+    map[v.vendorId] = {
+      vendorId: v.vendorId,
+      vendorName: v.vendorName,
+      unprocessedAmount: v.totalPayout,
+      unpaidAmount: 0,
+      unpaidSettlementCount: 0,
+    };
+  });
+
+  unpaid.forEach((v) => {
+    if (!map[v.vendorId]) {
+      map[v.vendorId] = {
+        vendorId: v.vendorId,
+        vendorName: v.vendorName,
+        unprocessedAmount: 0,
+        unpaidAmount: 0,
+        unpaidSettlementCount: 0,
+      };
+    }
+    map[v.vendorId].unpaidAmount = v.totalPayout;
+    map[v.vendorId].unpaidSettlementCount = v.settlementCount;
+  });
+
+  // Urutkan berdasarkan total tunggakan terbesar (paling mendesak di atas)
+  return Object.values(map)
+    .map((v) => VendorAttentionResponse(v))
+    .sort(
+      (a, b) =>
+        b.unprocessedAmount + b.unpaidAmount - (a.unprocessedAmount + a.unpaidAmount),
+    );
+};
+
 module.exports = {
   previewSettlement,
   createSettlement,
   getAllSettlements,
   getSettlementById,
   markSettlementAsPaid,
+  getVendorsNeedingAttention
 };

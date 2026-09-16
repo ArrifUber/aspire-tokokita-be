@@ -19,6 +19,10 @@ router.get("/preview", settlementHandler.preview);
 // Deskripsi: Mengambil semua daftar settlement
 router.get("/", settlementHandler.getAll);
 
+// Endpoint: [GET] /settlements/vendors-needing-attention
+// Deskripsi: Daftar vendor yang punya tunggakan belum diproses/dibayar
+router.get("/vendors-needing-attention", settlementHandler.getVendorsNeedingAttention);
+
 // Endpoint: [GET] /settlements/:id
 // Deskripsi: Mengambil detail satu settlement berdasarkan ID
 router.get("/:id", settlementHandler.getById);
@@ -30,5 +34,7 @@ router.post("/", settlementHandler.create);
 // Endpoint: [PATCH] /settlements/:id/pay
 // Deskripsi: Menandai settlement sebagai lunas
 router.patch("/:id/pay", settlementHandler.pay);
+
+
 
 module.exports = router;

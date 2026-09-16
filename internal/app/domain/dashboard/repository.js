@@ -78,19 +78,35 @@ const getTopProducts = async (limit = 5) => {
   }));
 };
 
-// Ringkasan status settlement (jumlah settlement per status)
-const getSettlementStatusCount = async () => {
-  const grouped = await prisma.vendorSettlement.groupBy({
-    by: ["status"],
-    _count: { _all: true },
-  });
+// Ringkasan status settlement (hitung berdasarkan jumlah unit settlement)
+const getVendorSettlementCoverage = async () => {
+  const [unprocessedGroup, unpaid, paid] = await Promise.all([
+    // 1. Hitung settlement yang BELUM DIBUAT 
+    // (Mengelompokkan vendor yang punya produk terjual dengan settlementId = null)
+    prisma.boughtProductDetail.groupBy({
+      by: ["vendorId"],
+      where: {
+        settlementId: null,
+        vendorId: { not: null },
+      },
+    }),
 
-  const result = { PAID: 0, UNPAID: 0 };
-  grouped.forEach((g) => {
-    result[g.status] = g._count._all;
-  });
+    // 2. Hitung total record settlement MENUNGGU DIBAYAR (UNPAID)
+    prisma.vendorSettlement.count({
+      where: { status: "UNPAID" },
+    }),
 
-  return result;
+    // 3. Hitung total record settlement SUDAH LUNAS (PAID)
+    prisma.vendorSettlement.count({
+      where: { status: "PAID" },
+    }),
+  ]);
+
+  return {
+    paid,
+    unpaid,
+    unprocessed: unprocessedGroup.length,
+  };
 };
 
 // Transaksi terbaru (untuk widget "Transaksi Terbaru")
@@ -164,7 +180,7 @@ module.exports = {
   getBelumDibayarVendor,
   getTransactionsInRange,
   getTopProducts,
-  getSettlementStatusCount,
+  getVendorSettlementCoverage,
   getRecentTransactions,
   getSalesByCategory,      
   getLowStockProducts,     

@@ -22,8 +22,9 @@ const TopProductResponse = (item) => ({
 });
 
 const SettlementStatusResponse = (data) => ({
-  paid: data.PAID,
-  unpaid: data.UNPAID,
+  paid: data.paid,
+  unpaid: data.unpaid,
+  unprocessed: data.unprocessed,
 });
 
 const RecentTransactionResponse = (transaction) => {

@@ -76,10 +76,73 @@ const markAsPaid = async (id) => {
   });
 };
 
+
+// Ambil semua vendor yang punya BoughtProductDetail belum di-settle,
+// dikelompokkan per vendor dengan total nilainya
+const getUnprocessedByVendor = async () => {
+  const items = await prisma.boughtProductDetail.findMany({
+    where: { settlementId: null, vendorId: { not: null } },
+    select: {
+      vendorId: true,
+      subtotal: true,
+      commissionPercent: true,
+      vendor: { select: { name: true } },
+    },
+  });
+
+  const map = {};
+  items.forEach((item) => {
+    if (!map[item.vendorId]) {
+      map[item.vendorId] = {
+        vendorId: item.vendorId,
+        vendorName: item.vendor.name,
+        totalPayout: 0,
+      };
+    }
+    const commission = item.subtotal * item.commissionPercent;
+    map[item.vendorId].totalPayout += item.subtotal - commission;
+  });
+
+  return Object.values(map).map((v) => ({
+    ...v,
+    totalPayout: Math.round(v.totalPayout),
+  }));
+};
+
+// Ambil semua settlement berstatus UNPAID, dikelompokkan per vendor
+const getUnpaidByVendor = async () => {
+  const settlements = await prisma.vendorSettlement.findMany({
+    where: { status: "UNPAID" },
+    select: {
+      vendorId: true,
+      totalPayout: true,
+      vendor: { select: { name: true } },
+    },
+  });
+
+  const map = {};
+  settlements.forEach((s) => {
+    if (!map[s.vendorId]) {
+      map[s.vendorId] = {
+        vendorId: s.vendorId,
+        vendorName: s.vendor.name,
+        totalPayout: 0,
+        settlementCount: 0,
+      };
+    }
+    map[s.vendorId].totalPayout += s.totalPayout;
+    map[s.vendorId].settlementCount += 1;
+  });
+
+  return Object.values(map);
+};
+
 module.exports = {
   findUnsettledBoughtProducts,
   createSettlement,
   findAll,
   findById,
   markAsPaid,
+  getUnpaidByVendor,
+  getUnprocessedByVendor
 };
