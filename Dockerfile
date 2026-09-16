@@ -1,20 +1,20 @@
-# Use official Node.js image as the base
-FROM node:20-alpine
-
-# Set the working directory
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# 1. Copy package & prisma schema
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm install
+# 2. Install dependencies
+RUN npm ci
 
-# Copy the rest of the application code
+# 3. Generate Prisma Client
+RUN npx prisma generate
+
+# 4. Copy sisa kode aplikasi
 COPY . .
 
-# Expose the application port (assuming 3000)
-EXPOSE 3000
+EXPOSE 3001
 
-# Command to run the application
-CMD ["node", "cmd/main.js"]
+# 5. Jalankan migrasi dulu, baru start server
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run seed-2 && node cmd/main.js"]
