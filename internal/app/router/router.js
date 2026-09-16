@@ -11,6 +11,7 @@ const reportRoutes = require("../domain/report/routes");
 const chatbotRoutes = require("../domain/chatbot/routes");
 const vendorRoutes = require("../domain/vendor/routes");
 const settlementRoutes = require("../domain/settlement/route")
+const dashboardRoute = require("../domain/dashboard/route");
 
 // Daftarkan route domain ke path yang sesuai
 router.use("/companies", companyRoutes);
@@ -23,5 +24,6 @@ router.use("/reports", reportRoutes);
 router.use("/chatbot", chatbotRoutes);
 router.use("/vendor", vendorRoutes)
 router.use("/settlements", settlementRoutes)
+router.use("/dashboard", dashboardRoute)
 
 module.exports = router;
